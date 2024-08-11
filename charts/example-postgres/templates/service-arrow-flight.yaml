@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-arrow-flight
+  labels:
+  {{- include "chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.arrowFlight.type }}
+  selector:
+    app: arrow-flight
+  {{- include "chart.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.arrowFlight.ports | toYaml | nindent 2 -}}

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-localstack
+  labels:
+    app: localstack
+  {{- include "chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.localstack.replicas }}
+  selector:
+    matchLabels:
+      app: localstack
+    {{- include "chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: localstack
+      {{- include "chart.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - env:
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: secret_access_key
+              name: aws-secret
+        - name: AWS_DEFAULT_REGION
+          value: {{ quote .Values.localstack.localstack.env.awsDefaultRegion }}
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: access_key_id
+              name: aws-secret
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.localstack.localstack.image.repository }}:{{ .Values.localstack.localstack.image.tag
+          | default .Chart.AppVersion }}
+        name: localstack
+        ports:
+        - containerPort: 4566
+          name: localstack
+        resources: {}
+        volumeMounts:
+        - mountPath: /etc/localstack/init/ready.d
+          name: localstack-init
+      volumes:
+      - configMap:
+          defaultMode: 511
+          name: {{ include "chart.fullname" . }}-localstack-init
+        name: localstack-init

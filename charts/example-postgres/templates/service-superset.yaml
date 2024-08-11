@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-superset-service
+  labels:
+  {{- include "chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.supersetService.type }}
+  selector:
+    app: superset
+  {{- include "chart.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.supersetService.ports | toYaml | nindent 2 -}}

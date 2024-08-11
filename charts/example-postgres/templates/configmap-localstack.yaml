@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "chart.fullname" . }}-localstack-init
+  labels:
+  {{- include "chart.labels" . | nindent 4 }}
+data:
+  bucket.py: {{ .Values.localstackInit.bucketPy | toYaml | indent 1 }}

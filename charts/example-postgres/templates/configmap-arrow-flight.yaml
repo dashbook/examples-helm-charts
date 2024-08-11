@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "chart.fullname" . }}-arrow-flight
+  labels:
+  {{- include "chart.labels" . | nindent 4 }}
+data:
+  aws-allow-http: {{ .Values.arrowFlight.awsAllowHttp | quote }}
+  aws-default-region: {{ .Values.arrowFlight.awsDefaultRegion | quote }}
+  aws-endpoint: {{ .Values.arrowFlight.awsEndpoint | quote }}
+  bucket: {{ .Values.arrowFlight.bucket | quote }}
+  current-database: {{ .Values.arrowFlight.currentDatabase | quote }}
+  flight-user: {{ .Values.arrowFlight.flightUser | quote }}
+  tls-domain: {{ .Values.arrowFlight.tlsDomain | quote }}

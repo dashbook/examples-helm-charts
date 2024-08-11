@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-arrow-flight
+  labels:
+  {{- include "chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.arrowFlight.replicas }}
+  selector:
+    matchLabels:
+      app: arrow-flight
+    {{- include "chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: arrow-flight
+      {{- include "chart.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - env:
+        - name: CATALOG_URL
+          valueFrom:
+            secretKeyRef:
+              key: catalog-url
+              name: postgres-secret
+        - name: BUCKET
+          valueFrom:
+            configMapKeyRef:
+              key: bucket
+              name: {{ include "chart.fullname" . }}-arrow-flight
+        - name: TLS_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              key: tls-domain
+              name: {{ include "chart.fullname" . }}-arrow-flight
+        - name: FLIGHT_USER
+          valueFrom:
+            configMapKeyRef:
+              key: flight-user
+              name: {{ include "chart.fullname" . }}-arrow-flight
+        - name: FLIGHT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: arrow-flight-secret
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: access_key_id
+              name: aws-secret
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: secret_access_key
+              name: aws-secret
+        - name: AWS_DEFAULT_REGION
+          valueFrom:
+            configMapKeyRef:
+              key: aws-default-region
+              name: {{ include "chart.fullname" . }}-arrow-flight
+        - name: AWS_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              key: aws-endpoint
+              name: {{ include "chart.fullname" . }}-arrow-flight
+        - name: AWS_ALLOW_HTTP
+          valueFrom:
+            configMapKeyRef:
+              key: aws-allow-http
+              name: {{ include "chart.fullname" . }}-arrow-flight
+        - name: CURRENT_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              key: current-database
+              name: {{ include "chart.fullname" . }}-arrow-flight
+        - name: RUST_LOG
+          value: {{ quote .Values.arrowFlight.arrowFlight.env.rustLog }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.arrowFlight.arrowFlight.image.repository }}:{{ .Values.arrowFlight.arrowFlight.image.tag
+          | default .Chart.AppVersion }}
+        name: arrow-flight
+        ports:
+        - containerPort: 31337
+        resources: {}

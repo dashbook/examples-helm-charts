@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-localstack
+  labels:
+  {{- include "chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.localstack.type }}
+  selector:
+    app: localstack
+  {{- include "chart.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.localstack.ports | toYaml | nindent 2 -}}
